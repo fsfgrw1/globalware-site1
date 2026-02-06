@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlobalWare | Select Version</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --accent: #ff6a00;
+            --bg: #0b0b0b;
+            --card-bg: rgba(30, 30, 32, 0.6);
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: var(--bg);
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Фоновое свечение */
+        .glow {
+            position: absolute; width: 300px; height: 300px;
+            background: var(--accent);
+            filter: blur(120px); opacity: 0.15; z-index: 0;
+        }
+
+        .selection-container {
+            position: relative; z-index: 10;
+            text-align: center; width: 90%; max-width: 800px;
+        }
+
+        h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 40px; }
+        h1 span { color: var(--accent); }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .version-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
+            color: white;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        .version-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+            box-shadow: 0 20px 40px rgba(255, 106, 0, 0.15);
+        }
+
+        .icon-box {
+            width: 70px; height: 70px;
+            background: rgba(255, 106, 0, 0.1);
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .version-card h2 { margin: 10px 0; font-size: 1.5rem; }
+        .version-card p { color: #8e8e93; font-size: 0.9rem; line-height: 1.4; }
+
+        .auto-detect {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glow"></div>
+    
+    <div class="selection-container">
+        <h1>GLOBAL<span>WARE</span></h1>
+        
+        <div class="grid">
+            <a href="#" onclick="goTo('pc')" class="version-card">
+                <div class="icon-box"><i data-lucide="monitor" size="32"></i></div>
+                <h2>ВЕРСИЯ ДЛЯ ПК</h2>
+                <p>Полный интерфейс для широкоформатных мониторов</p>
+            </a>
+
+            <a href="#" onclick="goTo('mobile')" class="version-card">
+                <div class="icon-box"><i data-lucide="smartphone" size="32"></i></div>
+                <h2>МОБИЛЬНАЯ ВЕРСИЯ</h2>
+                <p>Оптимизировано для сенсорного управления и iOS/Android</p>
+            </a>
+        </div>
+
+        <div class="auto-detect" id="status">Ожидание выбора...</div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // НАСТРОЙКИ ФАЙЛОВ
+        const PC_FILE = "index1.html";      // Название файла для ПК
+        const MOBILE_FILE = "index2.html"; // Название файла для телефонов
+
+        function goTo(type) {
+            if(type === 'pc') {
+                window.location.href = PC_FILE;
+            } else {
+                window.location.href = MOBILE_FILE;
+            }
+        }
+
+        // Автоматическое определение (опционально)
+        window.onload = () => {
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            const status = document.getElementById('status');
+            
+            if (isMobile) {
+                status.innerText = "Обнаружено мобильное устройство";
+                status.style.color = "#32d74b";
+            } else {
+                status.innerText = "Обнаружен компьютер";
+                status.style.color = "#0a84ff";
+            }
+        };
+    </script>
+</body>
+</html>

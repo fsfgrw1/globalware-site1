@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GlobalWare | Frostbite Elite</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600;800&display=swap');
+
+        :root {
+            --accent: #ff6a00;
+            --ios-bg: #0b0b0b;
+            --ios-glass: rgba(30, 30, 32, 0.85);
+            --ios-border: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Заставка загрузки */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: 0.8s;
+        }
+        .loader-logo { font-size: 2.5rem; font-weight: 800; letter-spacing: -2px; color: #fff; }
+        .loader-logo span { color: var(--accent); }
+
+        body {
+            margin: 0; background: var(--ios-bg); color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+            overflow-x: hidden; -webkit-font-smoothing: antialiased;
+        }
+
+        #snow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; opacity: 0.3; }
+        .bg-glow { position: fixed; top: -10%; left: 50%; width: 150%; height: 60%; background: radial-gradient(circle, rgba(255,106,0,0.1) 0%, rgba(0,0,0,0) 70%); transform: translateX(-50%); z-index: 0; }
+
+        .container { max-width: 480px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 10; }
+
+        nav { display: flex; justify-content: space-between; align-items: center; height: 80px; }
+        .logo { font-weight: 800; font-size: 1.4rem; }
+        .logo span { color: var(--accent); }
+        
+        .side-menu {
+            position: fixed; top: 0; right: -100%; width: 100%; height: 100%;
+            background: rgba(11, 11, 11, 0.98); backdrop-filter: blur(25px);
+            z-index: 1050; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px;
+        }
+        .side-menu.active { right: 0; }
+        .menu-link { font-size: 1.8rem; font-weight: 800; text-decoration: none; color: #fff; }
+
+        .online-count { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; color: #8e8e93; margin: 15px 0; }
+        .online-dot { width: 6px; height: 6px; background: #32d74b; border-radius: 50%; box-shadow: 0 0 10px #32d74b; }
+        .hero h1 { font-size: 4.8rem; font-weight: 900; margin: 0; letter-spacing: -4px; line-height: 0.9; }
+
+        .card { background: linear-gradient(145deg, #1e1e20, #0f0f10); border: 1px solid var(--ios-border); padding: 35px 25px; border-radius: 35px; text-align: center; margin-bottom: 20px; position: relative; }
+        .price { font-size: 4.5rem; font-weight: 800; letter-spacing: -4px; }
+        .price span { font-size: 2rem; color: var(--accent); }
+        .btn-ios { width: 100%; padding: 18px; border: none; border-radius: 18px; background: #fff; color: #000; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-ios:active { transform: scale(0.96); }
+
+        .devs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0 60px; }
+        .dev-card { background: var(--ios-glass); border: 1px solid var(--ios-border); padding: 20px; border-radius: 30px; text-align: center; cursor: pointer; }
+        .dev-photo { width: 90px; height: 90px; border-radius: 50%; border: 1px solid var(--accent); margin-bottom: 12px; object-fit: cover; background: #000; }
+
+
+.support-float { position: fixed; bottom: 30px; right: 25px; width: 60px; height: 60px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1000; box-shadow: 0 10px 20px rgba(255,106,0,0.3); }
+    </style>
+</head>
+<body>
+
+<div id="loader"><div class="loader-logo">GLOBAL<span>WARE</span></div></div>
+<canvas id="snow"></canvas>
+<div class="bg-glow"></div>
+
+<div class="side-menu" id="sideMenu">
+    <a href="#shop" class="menu-link" onclick="toggleMenu()">МАГАЗИН</a>
+    <a href="#devs" class="menu-link" onclick="toggleMenu()">КОМАНДА</a>
+    <div style="color: var(--accent); font-weight: 800; margin-top: 20px;" onclick="toggleMenu()">ЗАКРЫТЬ</div>
+</div>
+
+<div class="container">
+    <nav>
+        <div class="logo">GLOBAL<span>WARE</span></div>
+        <div onclick="toggleMenu()" style="cursor: pointer;"><i data-lucide="menu"></i></div>
+    </nav>
+
+    <div class="online-count"><div class="online-dot"></div> <span id="user-count">164</span> в сети</div>
+
+    <div class="hero">
+        <div style="color: #30d158; font-weight: 600; font-size: 0.8rem; margin-bottom: 5px;">● UNDETECTED</div>
+        <h1>FROSTBITE</h1>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 30px 0;">
+        <div class="card" style="padding: 20px; margin: 0; border-radius: 25px;">
+            <i data-lucide="target" style="color: var(--accent); margin-bottom: 10px;"></i>
+            <div style="font-weight: 700; font-size: 0.9rem;">Aimbot</div>
+        </div>
+        <div class="card" style="padding: 20px; margin: 0; border-radius: 25px;">
+            <i data-lucide="eye" style="color: var(--accent); margin-bottom: 10px;"></i>
+            <div style="font-weight: 700; font-size: 0.9rem;">Visuals</div>
+        </div>
+    </div>
+
+    <div id="shop" class="card">
+        <div style="font-size: 0.7rem; font-weight: 800; color: #8e8e93; letter-spacing: 1px;">DAY PASS</div>
+        <div class="price">199<span>₽</span></div>
+        <button class="btn-ios" onclick="alert('Переход к оплате...')">Купить доступ</button>
+    </div>
+
+    <div id="devs">
+        <h2 style="font-size: 1.8rem; font-weight: 900; margin-top: 50px;">Команда</h2>
+        <div class="devs-grid">
+            <div class="dev-card" onclick="showDev('owercy')">
+                <img src="dev2.jpg" class="dev-photo">
+                <div style="font-weight: 800; font-size: 0.9rem;">OWERCRY</div>
+            </div>
+            <div class="dev-card" onclick="showDev('global')">
+                <img src="dev1.jpg" class="dev-photo">
+                <div style="font-weight: 800; font-size: 0.9rem;">ГЛОБАЛ</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<a href="https://t.me/твой_ник" class="support-float"><i data-lucide="message-circle" style="color:#fff"></i></a>
+
+<script>
+    lucide.createIcons();
+    
+    window.onload = () => {
+        setTimeout(() => {
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 800);
+        }, 1200);
+        initSnow();
+    };
+
+    function toggleMenu() { document.getElementById('sideMenu').classList.toggle('active'); }
+
+    const devInfo = {
+        owercry { name: "OWERCRY", desc: "Главный разработчик ядра Frostbite." },
+        global: { name: "ГЛОБАЛ", desc: "Основатель проекта и идеолог." }
+    };
+
+    function showDev(id) {
+        alert(devInfo[id].name + ": " + devInfo[id].desc);
+    }
+
+    setInterval(() => {
+        const el = document.getElementById('user-count');
+        el.innerText = parseInt(el.innerText) + (Math.random() > 0.5 ? 1 : -1);
+    }, 4000);
+
+    function initSnow() {
+        const canvas = document.getElementById('snow');
+
+const ctx = canvas.getContext('2d');
+        let w, h, flakes = [];
+        function resize() { w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h; }
+        window.onresize = resize; resize();
+        for(let i=0; i<60; i++) flakes.push({x:Math.random()*w, y:Math.random()*h, r:Math.random()*2+1, d:Math.random()*0.8+0.2});
+        function draw() {
+            ctx.clearRect(0,0,w,h); ctx.fillStyle = "rgba(255,255,255,0.3)"; ctx.beginPath();
+            flakes.forEach(f => { ctx.moveTo(f.x, f.y); ctx.arc(f.x, f.y, f.r, 0, Math.PI*2); f.y += f.d; if(f.y > h) f.y = -10; });
+            ctx.fill(); requestAnimationFrame(draw);
+        }
+        draw();
+    }
+</script>
+</body>
+</html>

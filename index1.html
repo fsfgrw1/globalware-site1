@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>GlobalWare | Frostbite Elite</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600;800&display=swap');
+
+        :root {
+            --accent: #ff6a00;
+            --ios-bg: #0b0b0b;
+            --ios-glass: rgba(30, 30, 32, 0.85);
+            --ios-border: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Заставка загрузки */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: 0.8s;
+        }
+        .loader-logo { font-size: 2.5rem; font-weight: 800; letter-spacing: -2px; color: #fff; }
+        .loader-logo span { color: var(--accent); }
+
+        body {
+            margin: 0; background: var(--ios-bg); color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+            overflow-x: hidden; -webkit-font-smoothing: antialiased;
+        }
+
+        #snow { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            pointer-events: none; z-index: 1; opacity: 0.3; 
+        }
+        .bg-glow { 
+            position: fixed; top: -10%; left: 50%; width: 150%; height: 60%; 
+            background: radial-gradient(circle, rgba(255,106,0,0.1) 0%, rgba(0,0,0,0) 70%); 
+            transform: translateX(-50%); z-index: 0; 
+        }
+
+        /* Основной контейнер - изначально для мобильных */
+        .container { 
+            max-width: 480px; 
+            margin: 0 auto; 
+            padding: 0 20px; 
+            position: relative; 
+            z-index: 10; 
+        }
+
+        /* Навигация */
+        nav { display: flex; justify-content: space-between; align-items: center; height: 80px; }
+        .logo { font-weight: 800; font-size: 1.4rem; }
+        .logo span { color: var(--accent); }
+        
+        /* Боковое меню */
+        .side-menu {
+            position: fixed; top: 0; right: -100%; width: 100%; height: 100%;
+            background: rgba(11, 11, 11, 0.98); backdrop-filter: blur(25px);
+            z-index: 1050; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px;
+        }
+        .side-menu.active { right: 0; }
+        .menu-link { font-size: 1.8rem; font-weight: 800; text-decoration: none; color: #fff; }
+
+        /* Контент */
+        .online-count { 
+            display: inline-flex; align-items: center; gap: 8px; 
+            background: rgba(255,255,255,0.05); padding: 6px 14px; 
+            border-radius: 20px; font-size: 0.8rem; color: #8e8e93; margin: 15px 0; 
+        }
+        .online-dot { 
+            width: 6px; height: 6px; background: #32d74b; 
+            border-radius: 50%; box-shadow: 0 0 10px #32d74b; 
+        }
+        .hero h1 { 
+            font-size: 4.8rem; font-weight: 900; margin: 0; 
+            letter-spacing: -4px; line-height: 0.9; 
+        }
+
+        /* Карточки */
+        .card { 
+            background: linear-gradient(145deg, #1e1e20, #0f0f10); 
+            border: 1px solid var(--ios-border); padding: 35px 25px; 
+            border-radius: 35px; text-align: center; margin-bottom: 20px; 
+            position: relative; 
+        }
+        .price { font-size: 4.5rem; font-weight: 800; letter-spacing: -4px; }
+        .price span { font-size: 2rem; color: var(--accent); }
+        .btn-ios { 
+            width: 100%; padding: 18px; border: none; 
+            border-radius: 18px; background: #fff; color: #000; 
+            font-weight: 700; cursor: pointer; transition: 0.2s; 
+        }
+        .btn-ios:active { transform: scale(0.96); }
+
+        /* Команда разработчиков */
+        .devs-grid { 
+            display: grid; grid-template-columns: 1fr 1fr; 
+            gap: 15px; margin: 20px 0 60px; 
+        }
+        .dev-card { 
+            background: var(--ios-glass); border: 1px solid var(--ios-border); 
+            padding: 20px; border-radius: 30px; text-align: center; cursor: pointer; 
+        }
+        .dev-photo { 
+            width: 90px; height: 90px; border-radius: 50%; 
+            border: 1px solid var(--accent); margin-bottom: 12px; 
+            object-fit: cover; background: #000; 
+        }
+
+        /* Кнопка поддержки */
+        .support-float { 
+            position: fixed; bottom: 30px; right: 25px; width: 60px; height: 60px; 
+            background: var(--accent); border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            z-index: 1000; box-shadow: 0 10px 20px rgba(255,106,0,0.3); 
+        }
+
+        /* ========== МЕДИА-ЗАПРОСЫ ДЛЯ АДАПТИВНОСТИ ========== */
+
+        /* Для очень маленьких телефонов */
+        @media (max-width: 360px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .hero h1 {
+                font-size: 3.5rem;
+                letter-spacing: -3px;
+            }
+            
+            .price {
+                font-size: 3.5rem;
+            }
+            
+            .devs-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .card {
+                padding: 25px 20px;
+                border-radius: 25px;
+            }
+        }
+
+        /* Для планшетов (портретная ориентация) */
+        @media (min-width: 481px) and (max-width: 767px) {
+            .container {
+                max-width: 90%;
+            }
+            
+            .hero h1 {
+                font-size: 5.5rem;
+            }
+            
+            .devs-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .price {
+                font-size: 5rem;
+            }
+        }
+
+        /* Для ПК и планшетов (ландшафтная ориентация) */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 900px;
+                padding: 0 40px;
+            }
+            
+            body {
+                font-size: 18px;
+            }
+            
+            /* Улучшаем навигацию */
+            nav {
+                height: 100px;
+            }
+            
+            .logo {
+                font-size: 1.8rem;
+            }
+            
+            /* Улучшаем боковое меню для ПК */
+            .side-menu {
+                width: 400px;
+                right: -400px;
+            }
+            
+            .side-menu.active {
+                right: 0;
+            }
+            
+            .menu-link {
+                font-size: 2.5rem;
+            }
+            
+            /* Улучшаем геро-секцию */
+            .hero h1 {
+                font-size: 6rem;
+                letter-spacing: -5px;
+            }
+            
+            /* Реорганизуем карточки функций */
+            .features-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+                margin: 40px 0;
+            }
+            
+            .features-grid .card {
+                margin: 0;
+                padding: 30px 20px;
+                border-radius: 25px;
+            }
+            
+            /* Реорганизуем карточку товара для ПК */
+            #shop {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 40px;
+                align-items: center;
+                text-align: left;
+                padding: 40px 35px;
+            }
+            
+            #shop .price {
+                font-size: 5.5rem;
+                margin: 20px 0;
+            }
+            
+            #shop .btn-ios {
+                margin-top: 20px;
+            }
+            
+            /* Улучшаем сетку разработчиков */
+            .devs-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 25px;
+                margin: 40px 0 80px;
+            }
+            
+            .dev-photo {
+                width: 110px;
+                height: 110px;
+            }
+            
+            .dev-card {
+                padding: 25px;
+            }
+            
+            /* Улучшаем кнопку поддержки для ПК */
+            .support-float {
+                width: 70px;
+                height: 70px;
+                bottom: 40px;
+                right: 40px;
+            }
+            
+            /* Увеличиваем отступы для лучшей читаемости на ПК */
+            .card {
+                margin-bottom: 30px;
+            }
+        }
+
+        /* Для больших экранов ПК */
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1200px;
+            }
+            
+            .hero h1 {
+                font-size: 8rem;
+                letter-spacing: -6px;
+            }
+            
+            #shop {
+                gap: 60px;
+                padding: 50px 45px;
+            }
+            
+            #shop .price {
+                font-size: 6.5rem;
+            }
+            
+            .devs-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 35px;
+            }
+            
+            .dev-photo {
+                width: 130px;
+                height: 130px;
+            }
+            
+            /* Добавляем эффект при наведении для ПК */
+            .dev-card:hover {
+                transform: translateY(-5px);
+                transition: transform 0.3s ease;
+                border-color: var(--accent);
+            }
+            
+            .btn-ios:hover {
+                background: #f0f0f0;
+            }
+            
+            .support-float:hover {
+                transform: scale(1.1);
+                transition: transform 0.3s ease;
+            }
+        }
+
+        /* Для очень широких экранов */
+        @media (min-width: 1600px) {
+            .container {
+                max-width: 1400px;
+            }
+            
+            .hero h1 {
+                font-size: 9rem;
+            }
+        }
+
+        /* Для ландшафтной ориентации на мобильных */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+            
+            .side-menu {
+                justify-content: flex-start;
+                padding-top: 80px;
+            }
+            
+            .menu-link {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loader"><div class="loader-logo">GLOBAL<span>WARE</span></div></div>
+<canvas id="snow"></canvas>
+<div class="bg-glow"></div>
+
+<div class="side-menu" id="sideMenu">
+    <a href="#shop" class="menu-link" onclick="toggleMenu()">МАГАЗИН</a>
+    <a href="#devs" class="menu-link" onclick="toggleMenu()">КОМАНДА</a>
+    <div style="color: var(--accent); font-weight: 800; margin-top: 20px; cursor: pointer;" onclick="toggleMenu()">ЗАКРЫТЬ</div>
+</div>
+
+<div class="container">
+    <nav>
+        <div class="logo">GLOBAL<span>WARE</span></div>
+        <div onclick="toggleMenu()" style="cursor: pointer;"><i data-lucide="menu"></i></div>
+    </nav>
+
+    <div class="online-count"><div class="online-dot"></div> <span id="user-count">164</span> в сети</div>
+
+    <div class="hero">
+        <div style="color: #30d158; font-weight: 600; font-size: 0.8rem; margin-bottom: 5px;">● UNDETECTED</div>
+        <h1>FROSTBITE</h1>
+    </div>
+
+    <!-- Обновленная сетка функций с классом для адаптивности -->
+    <div class="features-grid">
+        <div class="card" style="padding: 20px; margin: 0; border-radius: 25px;">
+            <i data-lucide="target" style="color: var(--accent); margin-bottom: 10px;"></i>
+            <div style="font-weight: 700; font-size: 0.9rem;">Aimbot</div>
+        </div>
+        <div class="card" style="padding: 20px; margin: 0; border-radius: 25px;">
+            <i data-lucide="eye" style="color: var(--accent); margin-bottom: 10px;"></i>
+            <div style="font-weight: 700; font-size: 0.9rem;">Visuals</div>
+        </div>
+        <div class="card" style="padding: 20px; margin: 0; border-radius: 25px;">
+            <i data-lucide="shield" style="color: var(--accent); margin-bottom: 10px;"></i>
+            <div style="font-weight: 700; font-size: 0.9rem;">Safety</div>
+        </div>
+        <div class="card" style="padding: 20px; margin: 0; border-radius: 25px;">
+            <i data-lucide="zap" style="color: var(--accent); margin-bottom: 10px;"></i>
+            <div style="font-weight: 700; font-size: 0.9rem;">Performance</div>
+        </div>
+    </div>
+
+    <div id="shop" class="card">
+        <div style="display: contents;">
+            <div>
+                <div style="font-size: 0.7rem; font-weight: 800; color: #8e8e93; letter-spacing: 1px;">DAY PASS</div>
+                <div class="price">199<span>₽</span></div>
+                <div style="color: #8e8e93; font-size: 0.9rem; margin-top: 10px;">Полный доступ ко всем функциям на 24 часа</div>
+            </div>
+            <div>
+                <button class="btn-ios" onclick="alert('Переход к оплате...')">Купить доступ</button>
+                <div style="color: #8e8e93; font-size: 0.7rem; margin-top: 15px; text-align: center;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="devs">
+        <h2 style="font-size: 1.8rem; font-weight: 90100; margin-top: 50px;">Команда</h2>
+        <div class="devs-grid">
+            <div class="dev-card" onclick="showDev('owercry')">
+                <img src="dev2.jpg" class="dev-photo">
+                <div style="font-weight: 800; font-size: 0.9rem;">OWERCRY</div>
+                <div style="color: #8e8e93; font-size: 0.8rem; margin-top: 5px;">Главный разработчик ядра Frostbite</div>
+            </div>
+            <div class="dev-card" onclick="showDev('global')">
+                <img src="dev1.jpg" class="dev-photo">
+                <div style="font-weight: 800; font-size: 0.9rem;">ГЛОБАЛ</div>
+                <div style="color: #8e8e93; font-size: 0.8rem; margin-top: 5px;">ООснователь проекта и идеолог</div>
+            </div>
+
+<a href="https://t.me/owercry" class="support-float" target="_blank"><i data-lucide="message-circle" style="color:#fff"></i></a>
+
+<script>
+    lucide.createIcons();
+    
+    window.onload = () => {
+        setTimeout(() => {
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 800);
+        }, 1200);
+        initSnow();
+        updateCanvasSize(); // Инициализируем размер canvas
+    };
+
+    function toggleMenu() { 
+        document.getElementById('sideMenu').classList.toggle('active'); 
+    }
+
+    const devInfo = {
+        owercry: { name: "OWERCRY", desc: "Главный разработчик ядра Frostbite. Отвечает за основной функционал и безопасность." },
+        global: { name: "ГЛОБАЛ", desc: "Основатель проекта и идеолог. Управляет развитием и стратегией GlobalWare." },
+        designer: { name: "DESIGNER", desc: "UI/UX Дизайнер. Создает интерфейсы и обеспечивает удобство использования." },
+        tester: { name: "TESTER", desc: "QA Тестировщик. Проверяет стабильность и безопасность всех обновлений." }
+    };
+
+    function showDev(id) {
+        const dev = devInfo[id];
+        if (dev) {
+            alert(`${dev.name}\n\n${dev.desc}`);
+        }
+    }
+
+    // Динамическое обновление количества пользователей
+    setInterval(() => {
+        const el = document.getElementById('user-count');
+        let current = parseInt(el.innerText);
+        // Более реалистичное изменение количества пользователей
+        const change = Math.random() > 0.6 ? 1 : (Math.random() > 0.3 ? -1 : 0);
+        const newCount = Math.max(150, Math.min(200, current + change));
+        el.innerText = newCount;
+    }, 4000);
+
+    // Снежный эффект
+    function initSnow() {
+        const canvas = document.getElementById('snow');
+        const ctx = canvas.getContext('2d');
+        let w, h, flakes = [];
+        
+        function resize() { 
+            w = window.innerWidth; 
+            h = window.innerHeight; 
+            canvas.width = w; 
+            canvas.height = h; 
+        }
+        
+        window.onresize = resize; 
+        resize();
+        
+        // Создаем снежинки
+        for(let i = 0; i < 80; i++) {
+            flakes.push({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                r: Math.random() * 3 + 1,
+                d: Math.random() * 1 + 0.5,
+                sway: Math.random() * 0.5 - 0.25
+            });
+        }
+        
+        function draw() {
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+            ctx.beginPath();
+            
+            flakes.forEach(f => {
+                ctx.moveTo(f.x, f.y);
+                ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+                
+                // Движение снежинок
+                f.y += f.d;
+                f.x += f.sway;
+                
+                // Если снежинка упала, возвращаем ее наверх
+                if (f.y > h) {
+                    f.y = -10;
+                    f.x = Math.random() * w;
+                }
+                
+                // Если снежинка ушла за бок, возвращаем ее
+                if (f.x > w) f.x = 0;
+                if (f.x < 0) f.x = w;
+            });
+            
+            ctx.fill();
+            requestAnimationFrame(draw);
+        }
+        
+        draw();
+    }
+    
+    // Функция для обновления размера canvas
+    function updateCanvasSize() {
+        const canvas = document.getElementById('snow');
+        if (canvas) {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+    }
+    
+    // Обработчик изменения размера окна
+    window.addEventListener('resize', updateCanvasSize);
+    
+    // Закрытие меню при клике на ссылку
+    document.querySelectorAll('.menu-link').forEach(link => {
+        link.addEventListener('click', () => {
+            document.getElementById('sideMenu').classList.remove('active');
+        });
+    });
+    
+    // Закрытие меню при клике вне его (для ПК)
+    document.addEventListener('click', (e) => {
+        const sideMenu = document.getElementById('sideMenu');
+        const menuBtn = document.querySelector('nav div[onclick*="toggleMenu"]');
+        
+        if (sideMenu.classList.contains('active') && 
+            !sideMenu.contains(e.target) && 
+            !menuBtn.contains(e.target)) {
+            sideMenu.classList.remove('active');
+        }
+    });
+    
+    // Плавная прокрутка к якорям
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 100,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>
